@@ -85,7 +85,7 @@ This is a recommended tech-stack for building this prototype
 
 | Which    | Options                     |
 | -------- | --------------------------- |
-| Language | Golang, Java, C++           |
+| Language | JavaScript-Node.js          |
 | Database | Relational Database - MySQL |
 
 ### Keep in mind
