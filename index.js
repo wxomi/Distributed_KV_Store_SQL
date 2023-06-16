@@ -101,6 +101,10 @@ app.delete("/:key", (req, res) => {
       if (err) throw err;
       connection.beginTransaction((err) => {
         if (err) throw err;
+        //Why setting ttl to -1 instead of deleting the key?
+        //Because we are using B+ Tree for indexing
+        //So if we delete the key then B+ Tree will be rebalanced
+        //So we are setting ttl to -1 so that it will not be shown in select query
         const deleteQuery = `UPDATE kv_store SET ttl=-1 Where kv_key=? AND from_unixtime(ttl)>NOW()`;
         connection.query(deleteQuery, [req.params.key], (err, result) => {
           if (err) {
@@ -130,7 +134,10 @@ app.delete("/:key", (req, res) => {
 //Cron job to delete expired keys
 //Runs every day at 12:00 AM
 //Doing Batch delete to reduce the number of queries
-//Reducing number of Tree Balance operations
+//Why using cron job to batch delete instead of deleting on every request?
+//B+ Tree Rebalancing is done on every delete operation
+//So if we delete on every request then rebalancing will be done on every request
+//So we are doing batch delete to reduce the number of rebalancing
 const job = new cronJob("0 0 * * *", () => {
   try {
     pool.getConnection((err, connection) => {
